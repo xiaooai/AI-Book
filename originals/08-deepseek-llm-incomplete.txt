@@ -1,0 +1,42 @@
+这一篇是 2024 年 1 月的《DeepSeek LLM: Scaling Open-Source Language Models with Longtermism》。如果你已经读完刚才的 DeepSeek-V2 和 V3，再倒回来读这一篇，会发现它其实是 DeepSeek 整条技术路线的“第一章”。V2 最出名的是 MLA 和 MoE，V3 最出名的是把 MoE、FP8、MTP、通信优化推到极致；但这一篇 DeepSeek LLM 还没有那些后来非常有辨识度的架构创新，它真正想解决的是一个更基础的问题：**如果我们打算长期不断把开源大模型做大，究竟应该按照什么规律增加模型、数据和算力，而不是每次凭经验赌一次？**所以标题里那个很奇怪的 “Longtermism” 不是在谈哲学意义上的长期主义，而是在说：作者不只是想训练一个 7B 或 67B 模型拿排行榜成绩，而是希望先研究清楚 scaling law，建立一套以后从几十亿继续扩到几百亿、几千亿参数时还能使用的方法。论文最终训练了 DeepSeek LLM 7B 和 67B，使用约 2 万亿 token 的中英数据，然后再通过 SFT 和 DPO 得到 Chat 模型。([arXiv][1])
+
+先从 scaling law 说起，因为这是整篇论文真正的主角。假设我给你一亿元预算培养一个学生，你马上遇到一个资源分配问题：应该把钱用来“造一个更大的脑子”，还是“让他读更多书”？在大语言模型里就是：固定总算力 \(C\)，到底应该增加模型规模 \(N\)，还是增加训练数据 \(D\)？这件事看起来简单，实际上当时有两个非常著名但结论不完全相同的答案。GPT-3 时代 Kaplan 等人的 scaling law 更偏向“算力增加以后，模型规模应该增长得比较快”；后来 Chinchilla 研究发现很多大模型其实“书读得太少”，应该把更多算力投入数据，也就是用更多 token 训练相对小一些的模型。DeepSeek 的作者看到这里产生了一个很实际的问题：**如果前人的 scaling law 都不完全一致，那我们以后训练一个极其昂贵的大模型时到底信谁？**所以他们没有直接训练 67B，而是先做大量小模型实验，希望从小模型推导大模型应该怎么训练。([arXiv][1])
+
+用费曼法理解 scaling law，可以把它想成“先用小蛋糕研究配方，再烤一个价值几百万的大蛋糕”。你不会为了测试糖放多少，直接烤一万个巨型蛋糕；你会先做几十个小蛋糕，把面粉、糖、温度不断变化，找出规律，然后预测大蛋糕应该怎么做。训练大模型也是一样。作者在不同 compute budget 下训练很多较小模型，观察模型大小、数据量、batch size、learning rate 和最终 loss 的关系，再拟合成数学曲线。最后再根据这些曲线决定 7B 和 67B 应该怎么训练。更重要的是，他们发现这些小规模实验真的能够相当准确地预测最终大型模型的表现。([arXiv][1]) 你如果刚读完 GPT-4 Technical Report，应该会立刻发现两者思想非常像：GPT-4 也强调“先用小规模模型预测最终大模型”。这反映出一个越来越重要的变化：**训练大模型贵到一定程度以后，scaling law 就不再只是科学观察，而变成了工程预算工具。**
+
+但 DeepSeek 在这里又发现一个特别重要的问题：**“模型有多少参数”可能不是衡量模型大小最准确的方法。**以前 scaling law 常常用参数量 \(N\) 表示模型规模，然后粗略认为训练计算量 \(C≈6ND\)。作者觉得这个近似有问题，因为参数量并不能准确反映 attention 等操作实际用了多少计算，而且 embedding、词表这些参数虽然占参数，却不一定以同样方式贡献模型能力。所以他们提出用 **non-embedding FLOPs/token \(M\)** 来描述模型规模，然后把计算预算写成更直接的 \(C=MD\)。([arXiv][1]) 用生活里的比喻就是：以前我们衡量一家公司大小只数“员工有多少”，DeepSeek 说不够准确，因为两个公司同样一万人，一个可能大量员工不直接参与核心生产；不如测“处理一个订单实际需要多少工作量”。这为后来 DeepSeek 做 MoE 埋下了一个很有意思的思想伏笔：**总参数量和真正每 token 付出的计算，并不是同一个东西。**
+
+作者接着研究了一个很多人讲 scaling law 时容易忽略的问题：**learning rate 和 batch size 也应该随着规模变化。**想象我们已经知道“大脑”和“教材”该多大，但如果学习方法错了，最终成绩还是可能很差。作者在不同计算预算下做 grid search，发现随着 compute budget 增大，最佳 batch size 总体应该增加，而最佳 learning rate 总体应该降低。他们甚至拟合出了近似的幂律关系：最优学习率大致随 \(C^{-0.125}\) 下降，而最优 batch size 大致随 \(C^{0.327}\) 增长。([arXiv][1]) 数字本身不用背，真正值得记的是：**scaling 不只是“把模型放大”，训练超参数本身也存在 scaling behavior。**否则你拿一个训练 100M 模型的配方直接训练 100B，很可能不能发挥那个大模型真正的能力。
+
+然后论文出现了一个我认为特别值得记住、而且今天依然很重要的发现：**scaling law 不是宇宙常数，它会随着数据质量改变。**作者在开发过程中不断改进训练数据，于是顺手用不同版本的数据重新拟合 scaling curve，结果发现得到的最优“模型大小 vs 数据量”比例并不一样。更高质量的数据出现以后，同样增加一份 compute budget，更值得把其中较大比例投入**模型规模**。([arXiv][1]) 这件事非常有意思，因为它意味着 Kaplan 和 Chinchilla 得到不同 scaling law，不一定是谁“算错了”，可能部分来自数据、模型定义和训练设置不同。也就是说，不能拿别人论文里的公式机械地说：“70B 模型理论上就应该训练 X 万亿 token。”**数据质量改变以后，最优配方本身也可能改变。**
+
+用费曼法理解这个结论，可以想象两名学生。学生 A 手里是一百万页重复、低质量、充满垃圾的教材；学生 B 手里只有五十万页，但每页都是精心整理、信息密度极高的教材。你不能只用“看了多少页”比较他们获得了多少知识。如果教材质量越来越高，那么一个更聪明、更大的学生可以从同样数量的页面里榨出更多东西。DeepSeek 因此提出一个很有意思的反向用途：**甚至可以观察 scaling behavior 来间接判断数据质量。**如果换了一批数据以后，最优 scaling 更倾向于扩大模型，可能说明这些数据更值得被一个大容量模型学习。([arXiv][1]) 这已经不是简单的“数据越多越好”，而是开始研究 **data quality × model capacity × compute** 三者之间的关系。
+
+那么 DeepSeek 自己的数据是怎么做的？他们准备了约 **2 万亿 token**，主要是中文和英文。数据处理大体分成三个词：deduplication、filtering、remixing，也就是**去重、过滤、重新配比**。([arXiv][1]) 去重尤其值得注意。他们发现如果只在单次 Common Crawl dump 内去重，会漏掉大量跨时间重复网页；于是把很多 Common Crawl dumps 放在一起做更激进的全局去重。论文的实验很夸张：只处理一个 dump 时去重率约 22.2%，当范围扩大到 91 个 dumps 时，去重率达到 **89.8%**。([arXiv][1]) 这意味着互联网训练数据里存在巨量重复内容。模型如果反复读同一篇网页，看起来 token 数很多，实际新增的信息却非常少。所以**两万亿 token 的质量不能只看“两万亿”这个数字，还要看其中有多少真正独立、有信息量的内容。**
+
+Filtering 则是在问：“留下来的网页是不是值得模型花计算去学？”因为训练 token 本身就是钱。如果一块 GPU 花一秒钟学习垃圾广告、乱码和低信息网页，那一秒钟就不能拿去学习教材、代码、论文或高质量讨论。所以作者用语言和语义层面的质量判断提高训练数据的信息密度；remixing 则解决不同领域比例失衡的问题，让一些原本出现太少但有价值的数据得到更高采样权重。([arXiv][1]) 从这里已经能看到 DeepSeek 后来的一个长期特点：**不是把“更多 GPU”当唯一解，而是不断问怎样让每个 token、每次计算产生更高价值。**
+
+Tokenizer 也有一个值得注意的细节。DeepSeek LLM 使用 byte-level BPE，思路继承 GPT-2 那种能够覆盖广泛字符的 tokenization，同时针对中文、日文、韩文字符以及标点等做预切分，避免不合理地跨字符类别合并；数字则拆成单个数字 token。最终常规词表大约 10 万 token，加入特殊 token 后约 100,015，训练时预留到 102,400。([arXiv][1]) 这看起来只是工程细节，但对于中英双语模型非常重要：tokenizer 决定“一句话要被切成多少块”。如果中文 tokenization 特别低效，同样 4096 token 的 context，英文能装三页，中文可能只能装一页，那么模型所谓的“上下文长度”对不同语言其实不是同一种容量。
+
+模型架构本身反而非常保守，这一点特别值得注意。DeepSeek LLM 没有在这一代发明 MLA，也没有 MoE，基本沿用 **LLaMA 风格的 decoder-only Transformer**：Pre-Norm、RMSNorm、SwiGLU、RoPE。7B 有 30 层、hidden size 4096、32 个 attention heads；67B 有 **95 层**、hidden size 8192、64 个 attention heads，并且为了降低推理成本使用 GQA，把 KV heads 减少到 8；两个模型的训练上下文长度都是 4096。([arXiv][1]) 所以这一篇千万不要读成“DeepSeek 发明了一个新 Transformer”。作者实际上故意把架构保持得相对成熟，然后把研究精力放在 **data + scaling + training recipe** 上。换句话说，他们是在问：“如果发动机本身已经比较成熟，我们能不能先把燃料、尺寸和驾驶方法研究清楚？”
+
+67B 还有一个挺有意思的架构选择：相比把网络横向做得特别宽，DeepSeek 更倾向于增加**深度**，所以最终做到 95 层。作者认为这种设计能够获得更好的性能，同时也方便 pipeline parallelism 的切分。([arXiv][1]) 这里又能看到现代大模型架构的一个现实：模型结构不只是由“理论上哪种神经网络最好”决定，还会受到“我有多少 GPU、怎样切 pipeline、怎样减少通信”影响。到了 DeepSeek-V2/V3，这种算法和硬件共同设计的倾向会变得更明显。
+
+训练策略还有一个非常 DeepSeek 式的细节：他们没有使用当时很常见的 cosine learning-rate decay，而使用 **multi-step learning-rate scheduler**。学习率 warmup 后保持一个阶段，到训练 token 的 80% 左右降到峰值的约 31.6%，90% 后再降到约 10%。作者实验发现最终表现和 cosine 差不多，那为什么还要换？因为 multi-step 更方便**continual training**。([arXiv][1]) 比如今天训练到 2T token，半年以后又得到 1T 高质量数据，cosine schedule 已经把学习率慢慢降到底，很难直接接着训练；multi-step 则更容易复用之前的 checkpoint。这里标题里的 “longtermism” 又出现了：**他们在设计的不是“一次训练跑完就结束”的模型，而是一个未来可能不断增加数据、不断继续训练的模型家族。**
+
+训练完成以后得到的是 Base Model，但 Base Model 并不天然是好聊天机器人。所以作者又进入 alignment 阶段。第一步是 **SFT**，他们收集了超过 **100 万条 instruction 数据**，覆盖多种任务，然后继续训练模型，让它学会“用户问问题 → 我应该以助手方式回答”。([arXiv][1]) 如果预训练像一个人读完图书馆，SFT 就像第一次接受客服、教师、程序员等职业训练：你可能知道很多东西，但还需要学习别人问问题时应该怎样组织答案。
+
+接下来是 **DPO，Direct Preference Optimization**。这点和你刚读过 V2/V3 很有意思：V2 后来开始使用 GRPO，而这一代还是 DPO。DPO 要解决的问题是：我们有“人类更喜欢回答 A 而不是回答 B”这样的 preference 数据，怎样直接让模型以后更倾向生成 A 风格的答案？传统 RLHF 通常是先训练 reward model，再通过 PPO 做强化学习；DPO 发现可以把这个过程重新写成一个更直接的优化目标，直接增加 preferred response 相对 rejected response 的概率，不必完整搭一套复杂 RL pipeline。DeepSeek 用 SFT + DPO 得到了 DeepSeek Chat。论文报告 DPO 对开放式聊天评价有改善，但某些 benchmark 会出现轻微下降。这个现象你在 DeepSeek-V2 里又会看到，并被讨论为 alignment tax：**模型变得更符合人的偏好，并不保证所有考试成绩都同时上涨。**
+
+接下来才是大家最关心的：“训练出来到底怎么样？”论文报告 DeepSeek LLM 67B 在很多 benchmark 上超过参数量接近的 LLaMA-2 70B，尤其在**代码、数学和推理**方面优势明显。([arXiv][2]) 这其实很能体现数据和训练 recipe 的重要性，因为两者都是六七百亿级别的 dense Transformer，并不存在 DeepSeek-V2 那种 MLA 或 MoE 级别的架构差异。换句话说，作者想证明的是：**即使不发明一个全新神经网络，仅仅把数据、scaling、超参数和训练过程做好，也能让同一参数级别的模型产生很大性能差距。**
+
+经过 SFT 和 DPO 后，DeepSeek LLM 67B Chat 在论文自己的中英文开放式评测里还表现得比 GPT-3.5 更好。([arXiv][2]) 不过这里一定要像我们之前读 GPT-4 和 V3 那样保持严谨：这并不等于“DeepSeek 67B 全面超过 GPT-3.5”。论文说的是**他们采用的开放式中英文评价设置**中的结果，不同 benchmark、prompt、评分模型都会影响比较。所以真正值得记的不是“67B > GPT-3.5”这句排行榜口号，而是：**一个从头训练的开放模型，通过高质量数据、scaling 研究和后训练，已经可以进入当时强闭源聊天模型的竞争区间。**
+
+如果现在把 DeepSeek LLM → DeepSeek-V2 → DeepSeek-V3 连起来读，你会突然看清楚一条非常漂亮的演化路线。**DeepSeek LLM 这一代首先解决“怎么训练”：研究 scaling law、数据质量、超参数、训练基础设施，建立 7B/67B dense 模型；DeepSeek-V2 开始解决“怎么更便宜地变大”：用 DeepSeekMoE 把总参数和激活参数拆开，用 MLA 大幅压缩 KV cache；DeepSeek-V3 则继续解决“怎样把这套东西扩到极限”：671B MoE、37B 激活参数、FP8、MTP、auxiliary-loss-free load balancing、DualPipe 等。**所以如果直接从 V3 开始读，很容易觉得 DeepSeek 的故事就是“MoE + MLA”；但从这篇开始读，你会发现它最早建立的其实是另一种能力：**系统地研究 scaling，而不是盲目 scaling。**
+
+这也解释了为什么论文标题要写 **Scaling Open-Source Language Models with Longtermism**。这里的 long-term perspective 可以理解成：作者并不认为 7B 和 67B 是终点，所以真正有价值的不是“找到一套刚好适合 67B 的超参数”，而是找到一种方法，使得未来模型继续扩大时，可以根据小规模实验预测：模型应该多大、数据应该多少、batch size 应该多大、learning rate 应该多高。([arXiv][1]) 这其实是一种“造模型的科学”——不是只造一辆快车，而是研究以后怎样持续造更快的车。
+
+如果现在把整篇论文合上，用费
+
+[1]: https://arxiv.org/html/2401.02954v1 "DeepSeek LLM Scaling Open-Source Language Models with Longtermism"
+[2]: https://arxiv.org/abs/2401.02954 "[2401.02954] DeepSeek LLM: Scaling Open-Source Language Models with Longtermism"

@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>AI 阅读手记</title>
+<meta name="description" content="用自己的语言，读懂人工智能。一本持续生长的论文阅读手记。">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%23273342'/%3E%3Cpath d='M8 7h16v19H8z' fill='%23f7f4ed'/%3E%3Cpath d='M12 7v19' stroke='%23b47c44' stroke-width='2'/%3E%3C/svg%3E">
+<style>
+:root{color-scheme:light;--paper:#fffefb;--back:#f3f1ec;--ink:#29323c;--muted:#74756f;--line:#deded6;--accent:#8a542c;--size:19px}*{box-sizing:border-box}html{scroll-behavior:auto;scroll-padding-top:100px}body{margin:0;background:var(--back);color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"PingFang SC",sans-serif}button,a{-webkit-tap-highlight-color:transparent}button{font:inherit;color:inherit;cursor:pointer;border:1px solid var(--line);background:transparent;border-radius:6px;padding:7px 12px;font-size:14px}button:hover{background:var(--line)}a{color:inherit;text-decoration:none}a:focus-visible,button:focus-visible{outline:2px solid var(--accent);outline-offset:4px}.sidebar{position:fixed;inset:0 auto 0 0;width:286px;padding:38px 26px 24px;border-right:1px solid var(--line);overflow:auto;background:var(--back);z-index:3}.brand{font-family:"Songti SC","STSong",serif;font-size:25px;font-weight:700;letter-spacing:2px}.brand-mark{color:var(--accent);font-size:14px;letter-spacing:3px;margin-bottom:13px}.volume{font-size:13px;color:var(--muted);margin:12px 0 40px}.nav-label{font-size:12px;color:var(--muted);letter-spacing:3px;margin-bottom:20px}.chapter-link{display:block;font-size:16px;line-height:1.8;padding:12px 14px;background:var(--paper);border-left:3px solid transparent;margin-bottom:15px}.chapter-link span{display:block;font-size:12px;color:var(--accent);letter-spacing:1px;margin-bottom:4px}.section-link{display:block;font-size:14px;color:var(--muted);padding:9px 6px;line-height:1.6}.section-link:hover,.section-link.active{color:var(--accent)}.sidebar-foot{font-size:12px;color:var(--muted);margin-top:30px;padding-top:20px;border-top:1px solid var(--line)}.workspace{margin-left:286px}.toolbar{height:70px;display:flex;align-items:center;justify-content:space-between;padding:0 40px;position:sticky;top:0;background:var(--back);border-bottom:1px solid var(--line);z-index:2;gap:12px}.toolbar-label{font-size:13px;color:var(--muted);letter-spacing:1px}.tools{display:flex;gap:8px;align-items:center}.paper{max-width:900px;min-height:calc(100vh - 120px);margin:38px auto;background:var(--paper);padding:64px 76px 35px;box-shadow:0 4px 28px #24304005;border:1px solid var(--line)}.eyebrow{font-size:13px;letter-spacing:3px;color:var(--accent);margin-bottom:24px}h1{font-family:"Songti SC","STSong",serif;font-size:38px;line-height:1.5;letter-spacing:1px;margin:0;max-width:610px}.chapter-header{padding-bottom:24px}.source{font-family:inherit;font-size:13px;color:var(--muted);padding-bottom:30px;border-bottom:1px solid var(--line);margin-top:0}h2{font-size:22px;line-height:1.7;margin:46px 0 20px;font-weight:600}p{font-family:"Songti SC","STSong","Noto Serif CJK SC",serif;font-size:var(--size);line-height:2.15;letter-spacing:.02em;text-align:justify;overflow-wrap:anywhere;margin:0 0 24px}strong{font-weight:700;color:var(--ink)}.chapter-end{text-align:center;color:var(--muted);font-size:14px;padding:55px 0 25px;letter-spacing:4px}#progress{position:fixed;top:0;left:0;height:3px;width:0;background:var(--accent);z-index:5}#menu{display:none}.night{color-scheme:dark;--paper:#252b30;--back:#1c2227;--ink:#deded6;--muted:#aaa9a0;--line:#3b4145;--accent:#d7ab7c}.overlay{display:none}@media(min-width:1500px){.paper{margin-top:52px}}@media(max-width:1100px){.sidebar{width:248px;padding:28px 20px}.workspace{margin-left:248px}.paper{margin:24px;padding:45px 36px}.toolbar{padding:0 24px}h1{font-size:32px}}@media(max-width:760px){.sidebar{transform:translateX(-100%);width:286px;transition:transform .2s}.workspace{margin-left:0}.toolbar{padding:0 16px;height:64px}.toolbar-label{display:none}#menu{display:block}.paper{margin:0;border:0;padding:38px 24px}.eyebrow{font-size:12px}h1{font-size:30px}h2{font-size:21px}p{line-height:2}.menu-open .sidebar{transform:translateX(0)}.menu-open .overlay{display:block;position:fixed;inset:0;background:#0005;z-index:3}.tools{gap:6px}}@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}.sidebar{transition:none}}@media print{.sidebar,.toolbar,#progress{display:none}.workspace{margin:0}.paper{margin:0;max-width:none;border:0;box-shadow:none;padding:0}body{background:white}h2{break-after:avoid}p{orphans:3;widows:3}}
+.chapter-link{background:transparent}.chapter-link:hover{background:var(--paper)}.chapter-link.active{background:var(--paper);border-left-color:var(--accent);color:var(--accent)}
+.part-label{margin:30px 0 14px;color:var(--accent);font-size:12px;letter-spacing:2px}.part-label span{display:block;margin-top:7px;color:var(--muted);font-size:14px;line-height:1.7;letter-spacing:0}.chapter-link{font-size:14px;margin-bottom:5px;padding:9px 12px}.chapter-header{border-top:1px solid var(--line);padding-top:38px}article:first-child .chapter-header{border-top:0;padding-top:0}
+math{font-size:1em;letter-spacing:normal;text-align:initial}math[display="block"]{display:block;max-width:100%;overflow-x:auto;overflow-y:hidden;padding:12px 0;margin:16px 0;text-align:center}.katex{letter-spacing:normal}
+.comments{border-top:1px solid var(--line);padding:24px 0 40px;margin-top:8px}.comments h3{font-size:17px;margin:0 0 8px}.comment-note,.comment-status{font:13px/1.7 -apple-system,BlinkMacSystemFont,"PingFang SC",sans-serif;color:var(--muted);margin:0 0 12px}.comments textarea{display:block;width:100%;min-height:90px;resize:vertical;border:1px solid var(--line);border-radius:8px;background:var(--back);color:var(--ink);padding:12px;font:16px/1.7 inherit;font-family:inherit;font-size:16px;line-height:1.7}.comments textarea:focus{outline:2px solid var(--accent);outline-offset:2px}.comment-actions{display:flex;justify-content:flex-end;margin-top:10px}.comment-item{padding:16px 0;border-bottom:1px solid var(--line)}.comment-item p{font-family:inherit;font-size:16px;line-height:1.8;white-space:pre-wrap;text-align:left;margin:8px 0;overflow-wrap:anywhere}.comment-meta{display:flex;justify-content:space-between;align-items:center;color:var(--muted);font-size:12px;gap:12px}.comment-meta button{font-size:12px;padding:3px 8px}.comment-status{margin-top:8px}@media print{.comments{display:none}}
+</style>
+</head>
+<body>
+<div id="progress" aria-hidden="true"></div><div class="overlay" id="overlay"></div>
+<aside class="sidebar" id="contents"><div class="brand-mark">AI / READING NOTES</div><a href="#" class="brand">AI 阅读手记</a><div class="volume">用自己的语言，读懂人工智能。</div><div class="nav-label">目 录 / CONTENTS</div><nav aria-label="书籍目录">{{NAV}}</nav><div class="sidebar-foot">共 {{COUNT}} 章 · 持续更新的书</div></aside>
+<div class="workspace"><div class="toolbar"><button id="menu" aria-controls="contents" aria-expanded="false">目录</button><span class="toolbar-label">AI 阅读手记 / 阅读正文</span><div class="tools"><button id="smaller" aria-label="缩小字号">A−</button><button id="larger" aria-label="放大字号">A＋</button><button id="theme" aria-pressed="false">夜间</button><span id="percent" class="toolbar-label">0%</span></div></div><main class="paper">{{CONTENT}}</main></div>
+<script>
+const body=document.body, menu=document.getElementById('menu');
+function closeMenu(){body.classList.remove('menu-open');menu.setAttribute('aria-expanded','false')}
+menu.onclick=()=>{const open=body.classList.toggle('menu-open');menu.setAttribute('aria-expanded',String(open))};
+document.getElementById('overlay').onclick=closeMenu;
+document.querySelectorAll('nav a').forEach(a=>a.addEventListener('click',closeMenu));
+document.addEventListener('keydown',e=>{if(e.key==='Escape')closeMenu()});
+let size=19;
+document.getElementById('smaller').onclick=()=>{size=Math.max(16,size-1);document.documentElement.style.setProperty('--size',size+'px')};
+document.getElementById('larger').onclick=()=>{size=Math.min(28,size+1);document.documentElement.style.setProperty('--size',size+'px')};
+document.getElementById('theme').onclick=function(){const night=body.classList.toggle('night');this.textContent=night?'日间':'夜间';this.setAttribute('aria-pressed',String(night))};
+const headings=[...document.querySelectorAll('article')];
+function progress(){const max=document.documentElement.scrollHeight-innerHeight;const value=max>0?Math.round(scrollY/max*100):100;document.getElementById('progress').style.width=value+'%';document.getElementById('percent').textContent=value+'%';let current=headings[0]?.id||'';for(const h of headings){if(h.getBoundingClientRect().top<180)current=h.id}document.querySelectorAll('.chapter-link').forEach(a=>{const active=a.hash==='#'+current;a.classList.toggle('active',active);if(active)a.setAttribute('aria-current','location');else a.removeAttribute('aria-current')})}
+addEventListener('scroll',progress,{passive:true});addEventListener('resize',progress);progress();
+
+// Stable IDs retain notes across chapter reordering and book rebuilds.
+for(const article of document.querySelectorAll('article')){
+  const key='ai-reading-book:note:v1:'+article.id;
+  const section=document.createElement('section');section.className='comments';
+  section.innerHTML='<h3>我的读书笔记</h3><form><label class="comment-note">想法、问题，随手记在这里<textarea maxlength="50000" placeholder="写下你的想法…"></textarea></label><div class="comment-actions"><button type="submit">保存笔记</button></div></form><div class="comment-status" role="status" aria-live="polite"></div>';
+  article.append(section);
+  const form=section.querySelector('form'),input=section.querySelector('textarea'),status=section.querySelector('.comment-status');
+  try{
+    const saved=localStorage.getItem(key);
+    if(saved!==null)input.value=saved;
+    else{
+      const old=JSON.parse(localStorage.getItem('ai-reading-book:comments:v1:'+article.id)||'[]');
+      if(!Array.isArray(old))throw Error();
+      input.value=old.filter(c=>c&&typeof c.text==='string').map(c=>c.text).join('\n\n');
+      if(input.value){localStorage.setItem(key,input.value);status.textContent='已保留原有评论。'}
+    }
+    if(!status.textContent)status.textContent='仅保存在此浏览器；清除网站数据会删除笔记。';
+  }catch(error){status.textContent='浏览器存储暂不可用，请勿关闭尚未保存的内容。'}
+  input.addEventListener('input',()=>{status.textContent='有未保存的修改';input.dataset.dirty='true'});
+  form.onsubmit=e=>{
+    e.preventDefault();
+    try{localStorage.setItem(key,input.value);delete input.dataset.dirty;status.textContent='已保存在此浏览器。'}
+    catch(error){status.textContent='保存失败，请复制备份输入内容，并检查浏览器存储空间或权限。'}
+  };
+}
+addEventListener('beforeunload',e=>{if(document.querySelector('textarea[data-dirty]')){e.preventDefault();e.returnValue=''}});
+progress();
+</script>
+</body></html>
