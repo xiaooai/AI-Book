@@ -46,7 +46,9 @@
       "24-omega0.md",
       "25-psi0.md",
       "26-motionwam.md",
-      "30-motus2.md"
+      "30-motus2.md",
+      "33-tango.md",
+      "34-sage.md"
     ]
   },
   {
@@ -64,6 +66,13 @@
     "chapters": [
       "28-tencent-2026-interim.md",
       "29-xpeng-2025-annual.md"
+    ]
+  },
+  {
+    "label": "第七篇",
+    "title": "自动驾驶：空间感知与世界表示",
+    "chapters": [
+      "32-bevformer.md"
     ]
   }
 ]
