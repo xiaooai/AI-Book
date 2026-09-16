@@ -74,6 +74,7 @@
     "label": "第七篇",
     "title": "自动驾驶：空间感知与世界表示",
     "chapters": [
+      "37-m2bev.md",
       "32-bevformer.md"
     ]
   }
