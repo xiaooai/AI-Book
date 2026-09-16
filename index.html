@@ -57,7 +57,8 @@ math{font-size:1em;letter-spacing:normal;text-align:initial}math[display="block"
 <a class="chapter-link" href="#chapter-28">腾讯财报阅读：成熟业务与 AI 投入的资本配置</a>
 <a class="chapter-link" href="#chapter-29">小鹏年报阅读：规模、技术收入与现金流</a><div class="part-label">第七篇<span>自动驾驶：空间感知与世界表示</span></div>
 <a class="chapter-link" href="#chapter-37">M²BEV：先统一世界，再共享感知任务</a>
-<a class="chapter-link" href="#chapter-32">BEVFormer：用多视角与时间记忆构建俯视世界</a></nav><div class="sidebar-foot">共 37 章 · 持续更新的书</div></aside>
+<a class="chapter-link" href="#chapter-32">BEVFormer：用多视角与时间记忆构建俯视世界</a><div class="part-label">第八篇<span>AI 思想：方法、规模与研究反思</span></div>
+<a class="chapter-link" href="#chapter-38">The Bitter Lesson：让机器学会寻找答案</a></nav><div class="sidebar-foot">共 38 章 · 持续更新的书</div></aside>
 <div class="workspace"><div class="toolbar"><button id="menu" aria-controls="contents" aria-expanded="false">目录</button><span class="toolbar-label">AI 阅读手记 / 阅读正文</span><div class="tools"><button id="smaller" aria-label="缩小字号">A−</button><button id="larger" aria-label="放大字号">A＋</button><button id="theme" aria-pressed="false">夜间</button><span id="percent" class="toolbar-label">0%</span></div></div><main class="paper"><article id="chapter-3"><header class="chapter-header"><div class="eyebrow">第一篇 · 第 01 章</div><h1>GPT-1：从预测下一个词，到通用能力迁移</h1></header>
 <p class="source">论文：Improving Language Understanding by Generative Pre-Training（2018）</p>
 <h2 id="chapter-3-s1">01 · GPT 路线的起点</h2>
@@ -1435,6 +1436,40 @@ math{font-size:1em;letter-spacing:normal;text-align:initial}math[display="block"
 <h2 id="chapter-32-s15">15 · 用一分钟讲给朋友听</h2>
 <p>如果现在合上论文，用费曼法一分钟给朋友讲，我会这样说：<strong>自动驾驶车上有六个摄像头，但每张图都只是不同方向的二维透视画面。BEVFormer 先在汽车周围建立一张俯视网格，每个网格位置都有一个 learnable query，主动问：“现实世界这个位置现在有什么？”它根据相机几何把这个位置投影到对应摄像头，再用 deformable attention 从附近提取视觉特征，于是六张图被融合成统一 BEV 地图。它还把上一时刻的 BEV 保存下来，根据自己的车辆运动先对齐，再通过 temporal self-attention 融进当前 BEV，所以即使某辆车现在被遮住，也可以利用刚才的记忆；速度估计也因此大幅变准。最后同一张 BEV 可以同时拿去做 3D 检测和地图分割。在 nuScenes 上，它把 camera-only 3D detection 推到 56.9% NDS，比当时 DETR3D 高 9 个百分点。</strong></p>
 <p>所以这篇我建议最后只记一句话：<strong>不要让六个摄像头分别理解六个世界，而要让它们共同维护一个随时间更新的世界地图。</strong> 📖 更技术一点就是：<strong>BEV Queries 负责“世界里的哪里”，Spatial Cross-Attention 负责“现在看到了什么”，Temporal Self-Attention 负责“刚才这里发生过什么”。</strong>BEVFormer真正改变的不是一个检测头，而是感知系统内部“世界应该怎样表示”的方式。</p>
+<footer class="chapter-end">— 本章完 —</footer></article>
+<article id="chapter-38"><header class="chapter-header"><div class="eyebrow">第八篇 · 第 38 章</div><h1>The Bitter Lesson：让机器学会寻找答案</h1></header>
+<p class="source">短文：The Bitter Lesson（2019）</p>
+<h2 id="chapter-38-s1">01 · 苦涩的教训：通用方法与规模</h2>
+<p>这篇不是严格意义上的“论文”，而是强化学习先驱 Rich Sutton 在 2019 年写的一篇两页短文《The Bitter Lesson》。它很短，却可能是理解你前面读过的 GPT、DeepSeek、VLA、world model、机器人 scaling 这些论文最重要的一篇“总纲”。如果用费曼法把它压成一句话，就是：<strong>过去七十年的 AI 历史反复告诉我们，人类很喜欢把自己对问题的理解直接写进机器，但长期真正赢下来的，往往是那些更通用、能随着计算量增加而不断变强的方法；Sutton 认为最重要的两类这种方法就是 learning 和 search。</strong>之所以叫“苦涩的教训”，是因为研究者通常非常不愿意接受这一点：我们花几年理解一个领域，设计了漂亮的规则、特征和结构，结果最后一个看起来更“笨”、只是吃更多数据和算力的方法把它打败了。</p>
+<h2 id="chapter-38-s2">02 · 算力不是固定不变的</h2>
+<p>先想一个最简单的比喻。假设你想造一个会下棋的 AI，有两条路。第一条路是找世界冠军采访几十年，把“中央控制很重要”“马在这个位置通常很好”“王的安全应该怎样判断”这些人类智慧一条条写进程序；第二条路则是造一个非常通用的搜索器，让它每一步尽可能多地往未来试，然后通过学习越来越准确地判断局面。第一条路在算力很小的时候往往特别有效，因为人类已经替机器做了大量思考；第二条路最初看起来粗暴、低效。但 Sutton 的核心观察是：<strong>问题在于算力不是固定的。</strong>今天搜索 1000 个状态，十年后可能搜索一亿个状态；而“我们手工写进多少棋理”增长得没这么快。于是随着计算成本不断下降，那些能够直接把新增算力变成性能的方法，会迟早超过那些依赖固定人类知识的方法。Sutton 甚至说，很多 AI 研究隐含地假设“可用计算量基本不变”，在这个假设下当然应该尽可能加入人类知识；可稍微把时间尺度拉长，计算资源往往会发生巨大变化，于是这个假设本身就错了。</p>
+<h2 id="chapter-38-s3">03 · 国际象棋：机器不必像人思考</h2>
+<p>他先举国际象棋。1997 年击败世界冠军 Kasparov 的系统主要依赖大规模深度搜索。Sutton 回忆，当时不少计算机国际象棋研究者并不喜欢这个结果，因为他们多年努力的方向，是把人类对棋局特殊结构的理解放进程序，尽量减少“愚蠢的暴力搜索”。当一个更依赖搜索、硬件和计算的方法真正赢下来以后，人们会说：“这只是 brute force，不是真正的智能，也不是人类下棋的方式。”Sutton 认为这恰好体现了 bitter lesson：<strong>我们会不自觉地把“像人类思考”当成了“正确的智能方法”，但机器并没有义务用我们的方式解决问题。</strong>历史真正评判的是性能能不能随着资源继续扩展，而不是方法听起来像不像人脑。</p>
+<h2 id="chapter-38-s4">04 · 围棋：搜索与学习怎样利用计算</h2>
+<p>围棋又把这堂课重演了一遍，只是晚了大约二十年。围棋搜索空间巨大，所以很长时间大家觉得暴力搜索根本行不通，于是投入很多精力编码围棋专家知识。但后来真正取得巨大突破的仍然是 <strong>search + learning</strong>，尤其是通过 self-play 学 value function，再把学习到的判断和大规模搜索结合。Sutton 因此把 search 和 learning 放在非常特殊的位置：它们的共同点不是“听起来智能”，而是<strong>它们可以吞计算</strong>。给搜索更多算力，它能探索更多可能；给学习更多计算和数据，它能拟合更复杂的规律。这两种机制都拥有一个极重要的性质：今天多给你 10 倍资源，你有办法把这 10 倍资源继续转成能力。</p>
+<h2 id="chapter-38-s5">05 · 语音与视觉：人工知识的早期优势</h2>
+<p>语音识别也出现了同样的故事。早期研究者试图大量利用人类已有知识：音素是什么、声道怎样工作、单词怎样组成等等；另一派则越来越依赖统计方法和更多计算，比如 HMM。最终统计方法占上风，后来深度学习又把这个方向推得更远：更少依赖人工写进去的语言学结构，更多依赖大数据、学习和计算。计算机视觉也类似，过去研究者人工设计边缘、广义圆柱、SIFT 等特征，希望把“我们知道什么是视觉”直接放进算法；深度学习后来则让网络自己从数据中学习表示。Sutton 想强调的不是“这些人工知识从来没用”，而是一个更微妙的规律：<strong>它们往往在早期非常有用，甚至能明显领先；真正的问题是它们容易过早到达天花板，而且随着系统越来越复杂，还可能妨碍后面的 scaling。</strong></p>
+<h2 id="chapter-38-s6">06 · 为什么这个教训令人苦涩</h2>
+<p>这也是“苦涩”真正的来源。假设一个研究者用了十年研究“视觉应该分成哪些模块”，然后构造出一个非常漂亮的系统。他自然会希望未来的发展建立在这套理解之上；如果最后发现一个更通用的网络，只要给足数据和计算，就能自己学出比这些模块更有效的内部表示，这不仅是技术判断，还会冲击研究者对自己十年工作的心理投入。Sutton 总结这个历史模式时写得非常清楚：研究者不断尝试把知识写进 agent，这在短期往往有效，也让研究者感觉满意；但长期会趋于平台，甚至阻碍继续进步，最后突破反而来自把规模更大的 computation 交给 search 和 learning。</p>
+<h2 id="chapter-38-s7">07 · 不是拒绝先验，而是警惕瓶颈</h2>
+<p>不过这里最容易产生一个错误理解：<strong>The Bitter Lesson 并不是“不要使用任何人类知识”。</strong>Sutton 自己也说，两条路线逻辑上并不一定互相矛盾；问题是实践里，人类知识经常让方法变复杂，并且变得不适合利用越来越多的计算。 所以真正应该问的不是“这个设计有没有人类先验”，而是：<strong>这个先验会不会在规模变大以后成为瓶颈？</strong>比如卷积本身也是人设计的 inductive bias，Transformer 也是人设计的架构，强化学习里的 reward 也是人定义的；Bitter Lesson 并不要求把这些全删掉。它更倾向于保留“元方法”：我们设计一个可以自己发现规律的方法，而不是亲手把规律本身全部写进去。</p>
+<h2 id="chapter-38-s8">08 · 设计能够自行发现知识的方法</h2>
+<p>这就进入文章最后、也是我认为最深的一段。Sutton 说，世界和心智真正包含的内容是“极其复杂，而且无法简单化”的。空间、物体、多智能体、对称性这些东西，看起来好像可以让我们总结出几条漂亮原则然后写进 AI；但真实世界中这些概念的细节几乎没有尽头。于是我们的目标不应该是<strong>把我们已经发现的知识全部塞给机器</strong>，而应该设计能够自己发现知识的机制。他最后那句话可以用中文意译成：<strong>我们真正想要的 AI，是能够像我们一样发现东西的 AI，而不是一个里面装着所有我们已经发现东西的 AI。</strong> 这句话其实就是整篇文章的灵魂。</p>
+<h2 id="chapter-38-s9">09 · GPT：通用目标与涌现的能力</h2>
+<p>现在把它和你前面读的 GPT 系列连起来，会突然非常清楚。GPT 路线几乎就是 Bitter Lesson 的教科书式案例。早期 NLP 很容易想：“语言这么复杂，我们应该手写语法、词性、句法树、语义规则。”GPT 做的事情却粗暴得惊人：<strong>给 Transformer 海量文字，只让它预测下一个 token。</strong>没有一个单独课程叫“学翻译”、没有一个模块叫“常识推理”、没有一个手写规则告诉它“代词应该怎么理解”。GPT-1 发现 next-token prediction 能产生可迁移表示；GPT-2 发现任务能力会自己从文本里出现；GPT-3 发现模型足够大后甚至能从上下文学任务。你前面一直问“为什么猜下一个词最后会变成这么多能力”，Bitter Lesson 给出的哲学答案就是：<strong>不要急着替模型规定它应该学习哪些中间知识；找一个足够通用、能够吞数据和算力的目标，让学习过程自己寻找内部结构。</strong></p>
+<h2 id="chapter-38-s10">10 · DeepSeek：效率、规模与推理</h2>
+<p>DeepSeek 那条线也完全可以这样理解。DeepSeek LLM 研究 scaling law，本质是在问：既然通用学习方法随着 compute 扩张会变强，那我们怎样精确知道参数和数据应该怎么 scaling；DeepSeek-V2/V3 的 MoE、MLA、FP8、DualPipe，则是在做另一层工作：<strong>既然 scaling 是核心，那就让每单位算力尽可能便宜，让系统能继续 scale。</strong>R1 又把 Bitter Lesson 往 reasoning 推了一步：与其人工写几十万条“正确的思考模板”，有没有可能只定义可验证 reward，然后让强化学习自己探索反思、检查、重试这些推理策略？这和 AlphaGo 的 self-play 味道非常相似：<strong>不要只让 AI 模仿我们已经知道怎么想，而让它通过 search / learning 自己找到有效策略。</strong></p>
+<h2 id="chapter-38-s11">11 · 机器人：模块化知识与通用学习</h2>
+<p>你前面读的机器人论文，其实更能说明 Bitter Lesson 为什么直到今天仍然是一个“没有彻底学会的教训”。机器人特别容易诱惑研究者加入大量人类工程知识：这个模块负责导航，这个模块负责抓取，这里手写坐标变换，这里设定动作 primitive，这里写一个 planner，这里再用规则判断失败。短期这通常非常有效，因为机器人数据少、模型能力有限。但 π0、GEN、Human-to-Robot、S1 这些工作正在重复 GPT 历史的另一个方向：<strong>把更多机器人、更多任务、更多身体、更多人类视频混起来，用越来越通用的学习机制，让 skill、task decomposition、cross-embodiment transfer、in-context learning逐渐从规模中出现。</strong>如果 Bitter Lesson 在 robotics 里继续成立，那么长期最强的系统可能不是拥有最多手工技能模块的机器人，而是最能继续吸收计算、数据和自身经验的机器人。</p>
+<h2 id="chapter-38-s12">12 · BEV：几何先验能否帮助扩展</h2>
+<p>但像你刚读的 BEVFormer、M²BEV、Dexterity-BEV，又提醒我们不要把 Bitter Lesson 理解得太极端。BEV 是一个非常强的人类几何先验：我们明确知道不同摄像头的像素应该通过相机几何对齐到统一世界坐标，这不是网络自己从零发现的。但这种设计未必违反 Bitter Lesson。真正的问题要看：<strong>BEV 是不是帮助通用学习更好 scaling，还是把系统锁死在人类手写的世界理解里？</strong>如果统一坐标只是消除没有意义的相机差异，让后面的神经网络更容易用百万小时数据学习，那么它可能反而是一个很好的“元结构”。但如果我们开始手写“看到这种车就做 A、这种路口就做 B”几万条规则，那就越来越接近 Sutton 警告的方向。所以 Bitter Lesson 不是“所有 inductive bias 都错”，而更像一句设计检查题：<strong>你现在加入的聪明结构，是在帮助机器自己发现复杂性，还是在替机器决定复杂性应该长什么样？</strong></p>
+<h2 id="chapter-38-s13">13 · 世界模型：学习规律与物理工具</h2>
+<p>同样，world model 也可以从这个角度看。我们当然可以手写牛顿力学、碰撞规则、物体类别，再要求 planner 按照这些人工模型行动；另一条路线是 MotionWAM、Motus2 那样，让模型从大量视频和动作中自己学习“做这个动作以后世界会发生什么”。后者更符合 Sutton 所说的 meta-method：<strong>我们并不把所有世界规律写进模型，而是给模型一种能够发现世界规律的训练方法。</strong>至于未来最强系统会完全放弃显式物理，还是把可学习 world model 和硬物理工具结合，现在并没有被 Bitter Lesson提前决定；它只提醒我们，长期应该特别警惕那些无法随着数据和计算继续变强的固定知识模块。</p>
+<h2 id="chapter-38-s14">14 · 现实修正：资源与经济约束</h2>
+<p>还有一个非常重要的现实修正：Sutton 2019 年把论证的一部分建立在“单位计算成本持续指数下降”上。 今天我们不应该把它机械理解成“Moore&#x27;s Law 永远按原速度继续，因此只要堆算力就行”。大模型时代已经很明显地遇到电力、芯片、数据、内存带宽和经济成本约束。Bitter Lesson 真正经得起时间的部分并不是“compute 永远便宜”，而是：<strong>当某种资源确实能够大规模增加时，能够有效利用这种资源的通用方法，长期通常更有优势。</strong>资源可以是训练 FLOPs，也可以是推理 FLOPs、数据、机器人运行小时、self-play experience，甚至模型生成的 synthetic experience。你之前读 GEN-0 时看到的“physical intelligence scales”，本质上正是在问：机器人有没有找到属于自己的这种可扩张资源。</p>
+<h2 id="chapter-38-s15">15 · 用一分钟讲给朋友听</h2>
+<p>如果现在把两页纸合上，用费曼法要求一分钟讲给一个完全不懂 AI 的朋友，我会这样说：<strong>AI 历史里，人总想把自己理解世界的方法直接写进机器，因为短期这样很聪明、很省计算。但计算越来越便宜、数据越来越多以后，那些依赖固定人类知识的方法容易走到头；真正一次次赢下来的，往往是更通用的搜索和学习算法，因为给它们更多计算，它们还能继续自己发现更好的规则。国际象棋、围棋、语音识别和计算机视觉都重复了这个模式。所以 Sutton 认为，我们不应该把主要精力放在告诉 AI“世界具体是什么样”，而应该设计能够让 AI 自己发现世界结构的方法。真正想造的不是一个装满人类已有发现的机器，而是一个能够继续发现的机器。</strong></p>
+<p>所以这篇我建议最后只记一句话：<strong>不要把我们的答案写进 AI，要把“寻找答案的方法”写进 AI。</strong> 📖 如果再压缩成你前面所有论文都能套进去的一条检查标准，就是：<strong>这个方法，数据和计算增加 100 倍以后，还会继续变强吗？</strong>如果答案是“会”，它很可能更接近 Bitter Lesson 所推崇的方向；如果答案是“不会，因为规则已经被我们写死了”，那它即使今天很好用，长期也值得警惕。</p>
 <footer class="chapter-end">— 本章完 —</footer></article></main></div>
 <script>
 const body=document.body, menu=document.getElementById('menu');
